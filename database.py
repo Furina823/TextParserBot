@@ -17,6 +17,10 @@ def get_gmt8_time():
     gmt8 = timezone(timedelta(hours=8))
     return datetime.now(gmt8).strftime("%Y-%m-%d %H:%M:%S")
 
+def normalize_username(username: str) -> str:
+    """Normalize usernames for case-insensitive matching."""
+    return username.strip().lower()
+
 def save_to_db(data, uploader_name, upload_time, guild_id):
     """Save character data to guild-specific database"""
     db_file = get_db_file(guild_id)
@@ -30,14 +34,20 @@ def save_to_db(data, uploader_name, upload_time, guild_id):
     data["uploaded_by"] = uploader_name
     data["uploaded_at"] = upload_time
 
-    # Remove duplicate entries (same username + class)
+    normalized_username = normalize_username(data.get("username", ""))
+
+    # Remove duplicate entries (same username + class), ignoring username case
     replaced = any(
-        entry.get("username") == data.get("username") and entry.get("class") == data.get("class")
+        normalize_username(entry.get("username", "")) == normalized_username
+        and entry.get("class") == data.get("class")
         for entry in db
     )
     db = [
         entry for entry in db
-        if not (entry["username"] == data["username"] and entry["class"] == data["class"])
+        if not (
+            normalize_username(entry.get("username", "")) == normalized_username
+            and entry.get("class") == data.get("class")
+        )
     ]
 
     db.append(data)
@@ -91,8 +101,15 @@ def delete_character(guild_id, username, class_name):
     """Delete a specific character from database"""
     db = load_db(guild_id)
     original_count = len(db)
+    normalized_username = normalize_username(username)
     
-    db = [entry for entry in db if not (entry["username"] == username and entry["class"] == class_name)]
+    db = [
+        entry for entry in db
+        if not (
+            normalize_username(entry.get("username", "")) == normalized_username
+            and entry["class"] == class_name
+        )
+    ]
     
     if len(db) == original_count:
         return False  # Nothing deleted
@@ -106,14 +123,21 @@ def delete_character(guild_id, username, class_name):
 def delete_user(guild_id, username):
     """Delete all characters for a username from database"""
     db = load_db(guild_id)
+    normalized_username = normalize_username(username)
     
-    matching_entries = [entry for entry in db if entry["username"] == username]
+    matching_entries = [
+        entry for entry in db
+        if normalize_username(entry.get("username", "")) == normalized_username
+    ]
     count = len(matching_entries)
     
     if count == 0:
         return 0  # No entries found
     
-    db = [entry for entry in db if entry["username"] != username]
+    db = [
+        entry for entry in db
+        if normalize_username(entry.get("username", "")) != normalized_username
+    ]
     
     db_file = get_db_file(guild_id)
     with open(db_file, "w", encoding="utf-8") as f:
