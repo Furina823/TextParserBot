@@ -36,12 +36,21 @@ def save_to_db(data, uploader_name, upload_time, guild_id):
 
     normalized_username = normalize_username(data.get("username", ""))
 
-    # Remove duplicate entries (same username + class), ignoring username case
+    # Resolve canonical casing from any existing entry for this player (any class)
+    any_existing = next(
+        (entry for entry in db
+         if normalize_username(entry.get("username", "")) == normalized_username),
+        None
+    )
+    if any_existing:
+        data["username"] = any_existing["username"]
+
     replaced = any(
         normalize_username(entry.get("username", "")) == normalized_username
         and entry.get("class") == data.get("class")
         for entry in db
     )
+
     db = [
         entry for entry in db
         if not (

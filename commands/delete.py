@@ -64,8 +64,13 @@ def setup(bot: commands.Bot):
     @delete_character.autocomplete('username')
     async def delete_char_username_autocomplete(interaction: discord.Interaction, current: str):
         db = load_db(interaction.guild_id)
-        usernames = sorted({entry["username"] for entry in db if "username" in entry})
-        
+        seen = {}
+        for entry in db:
+            if "username" in entry:
+                key = entry["username"].lower()
+                if key not in seen:
+                    seen[key] = entry["username"]
+        usernames = sorted(seen.values())
         return [
             app_commands.Choice(name=name, value=name)
             for name in usernames if current.lower() in name.lower()
