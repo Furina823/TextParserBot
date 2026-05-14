@@ -9,13 +9,13 @@ from parser import get_class_display
 async def show_character_details(interaction, entry):
     """Show character details with item buttons"""
     load_codes = entry.get("load_codes") or []
-    uploaded_info = f"Last updated by: {entry.get('uploaded_by', 'Unknown')}\nDate: {entry.get('uploaded_at', 'Unknown')}"
+    uploaded_info = f"Last updated by (最後更新者): {entry.get('uploaded_by', 'Unknown')}\nDate (日期): {entry.get('uploaded_at', 'Unknown')}"
     
     class_display = get_class_display(entry['class'])
     
     embed = discord.Embed(title=f"👤 {entry['username']}", color=discord.Color.gold())
     embed.add_field(name="Class (職業)", value=class_display, inline=False)
-    embed.add_field(name="Version Info", value=f"Played(遊玩版本): {entry['played_version']}\nCompat(版本相容): {entry['compatible_version']}", inline=True)
+    embed.add_field(name="Version Info (版本資訊)", value=f"Played(遊玩版本): {entry['played_version']}\nCompat(版本相容): {entry['compatible_version']}", inline=True)
     embed.add_field(name="Upload Info(上傳)", value=uploaded_info, inline=True)
 
     view = TimedView(timeout=300)
@@ -27,7 +27,7 @@ async def show_character_details(interaction, entry):
         storage_items = entry.get("storage") or []
 
         embed = discord.Embed(
-            title=f"📦 Items for {entry['username']}",
+            title=f"📦 Items for {entry['username']} (物品清單)",
             color=discord.Color.blurple(),
         )
 
@@ -37,7 +37,7 @@ async def show_character_details(interaction, entry):
 
         def add_section_fields(title_prefix: str, raw_items, page: int | None = None, per_page: int = 20):
             if not raw_items:
-                embed.add_field(name=title_prefix, value="_Empty_", inline=False)
+                embed.add_field(name=title_prefix, value="_Empty (空)_", inline=False)
                 return
 
             items = raw_items
@@ -62,7 +62,7 @@ async def show_character_details(interaction, entry):
 
             title = title_prefix
             if page is not None and total_pages > 1:
-                title = f"{title_prefix} – Page {page + 1}/{total_pages}"
+                title = f"{title_prefix} – Page {page + 1}/{total_pages} (頁)"
 
             embed.add_field(name=title, value=left[:1024], inline=True)
             if right:
@@ -76,7 +76,7 @@ async def show_character_details(interaction, entry):
             add_section_fields("🗄️ Storage (倉庫)", storage_items, page=storage_page, per_page=20)
 
         total_items = len(inv_items) + len(bag_items) + len(storage_items)
-        embed.set_footer(text=f"Total: {total_items} items")
+        embed.set_footer(text=f"Total (總計): {total_items} items (件)")
         return embed
 
     def make_items_view(section: str = "inventory", storage_page: int = 0) -> TimedView:
@@ -85,9 +85,9 @@ async def show_character_details(interaction, entry):
 
         # Section buttons (tabs)
         sections = [
-            ("inventory", "📦 Inventory"),
-            ("bag", "🎒 Bag"),
-            ("storage", "🗄️ Storage"),
+            ("inventory", "📦 Inventory (裝備)"),
+            ("bag", "🎒 Bag (背包)"),
+            ("storage", "🗄️ Storage (倉庫)"),
         ]
 
         for key, label in sections:
@@ -174,7 +174,7 @@ def create_grid_embed(title, items, page, is_class_search):
     current_items = items[start:end]
     
     embed = discord.Embed(title=title, color=discord.Color.blue())
-    embed.set_footer(text=f"Page {page + 1} • Total: {len(items)}")
+    embed.set_footer(text=f"Page {page + 1} (頁) • Total (總計): {len(items)}")
 
     for item in current_items:
         name = item["entry"]["username"] if is_class_search else item["full_name"]

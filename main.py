@@ -45,8 +45,7 @@ async def on_message(message):
                     if replaced and bound_id and bound_id != message.author.id:
                         await message.channel.send(
                             f"<@{bound_id}> ⚠️ New upload for **{data['username']}** "
-                            f"({get_class_display(data['class'])}) by {message.author.mention} (有新版本上傳)",
-                            delete_after=30
+                            f"({get_class_display(data['class'])}) by {message.author.mention} (有新版本上傳)"
                         )
                 except Exception:
                     pass

@@ -31,13 +31,13 @@ def setup(bot: commands.Bot):
         async def render(inter, page=0, edit=False):
             from ui.embeds import create_grid_embed, show_character_details  # import here to avoid circular import
             from ui.views import TimedView
-            embed, has_next = create_grid_embed(f"Characters for {username}", table_items, page, False)
+            embed, has_next = create_grid_embed(f"Characters for {username} (角色列表)", table_items, page, False)
             view = TimedView(timeout=300)  # 5 minutes
 
             start = page * 9
             page_items = table_items[start:start+9]
             select = discord.ui.Select(
-                placeholder="Select character...",
+                placeholder="選擇角色 (Select character)...",
                 options=[discord.SelectOption(label=item["full_name"][:100], value=str(i + start)) 
                          for i, item in enumerate(page_items)]
             )
@@ -86,13 +86,13 @@ def setup(bot: commands.Bot):
         async def render(inter, page=0, edit=False):
             from ui.embeds import create_grid_embed, show_character_details
             from ui.views import TimedView
-            embed, has_next = create_grid_embed(f"Players: {get_class_display(class_name)}", table_items, page, True)
+            embed, has_next = create_grid_embed(f"Players: {get_class_display(class_name)} (玩家列表)", table_items, page, True)
             view = TimedView(timeout=300)  # 5 minutes
 
             start = page * 9
             page_items = table_items[start:start+9]
             select = discord.ui.Select(
-                placeholder="Select player...",
+                placeholder="選擇玩家 (Select player)...",
                 options=[discord.SelectOption(label=item["entry"]["username"], value=str(i + start))
                          for i, item in enumerate(page_items)]
             )
