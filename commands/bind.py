@@ -6,24 +6,14 @@ from database import set_binding, remove_binding, get_binding, load_bindings
 
 
 def setup(bot: commands.Bot):
-    @bot.tree.command(
-        name="bind-user",
-        description="Bind a Player ID to a Discord user (綁定玩家ID)"
-    )
-    @app_commands.describe(username="玩家ID", user="要綁定的 Discord 使用者")
-    async def bind_user(interaction: discord.Interaction, username: str, user: discord.Member):
+    async def bind_user_response(interaction: discord.Interaction, username: str, user: discord.Member):
         set_binding(interaction.guild_id, username, user.id)
         await interaction.response.send_message(
             f"✅ Bound **{username}** → {user.mention} (已綁定)",
             ephemeral=True
         )
 
-    @bot.tree.command(
-        name="unbind-user",
-        description="Remove binding for a Player ID (解除玩家ID綁定)"
-    )
-    @app_commands.describe(username="玩家ID")
-    async def unbind_user(interaction: discord.Interaction, username: str):
+    async def unbind_user_response(interaction: discord.Interaction, username: str):
         existed = remove_binding(interaction.guild_id, username)
         if not existed:
             return await interaction.response.send_message(
@@ -35,11 +25,7 @@ def setup(bot: commands.Bot):
             ephemeral=True
         )
 
-    @bot.tree.command(
-        name="show-bindings",
-        description="Show all current Player ID bindings (顯示所有綁定列表)"
-    )
-    async def show_bindings(interaction: discord.Interaction):
+    async def show_bindings_response(interaction: discord.Interaction):
         bindings = load_bindings(interaction.guild_id)
         if not bindings:
             return await interaction.response.send_message(
@@ -51,6 +37,52 @@ def setup(bot: commands.Bot):
             "**Binding List (綁定列表):**\n" + "\n".join(lines),
             ephemeral=True
         )
+
+    @bot.tree.command(
+        name="bind-user",
+        description="Bind a Player ID to a Discord user (綁定玩家ID)"
+    )
+    @app_commands.describe(username="玩家ID", user="要綁定的 Discord 使用者")
+    async def bind_user(interaction: discord.Interaction, username: str, user: discord.Member):
+        await bind_user_response(interaction, username, user)
+
+    @bot.tree.command(
+        name="綁定",
+        description="綁定玩家 ID 到 Discord 使用者"
+    )
+    @app_commands.describe(username="玩家ID", user="要綁定的 Discord 使用者")
+    async def bind_user_zh(interaction: discord.Interaction, username: str, user: discord.Member):
+        await bind_user_response(interaction, username, user)
+
+    @bot.tree.command(
+        name="unbind-user",
+        description="Remove binding for a Player ID (解除玩家ID綁定)"
+    )
+    @app_commands.describe(username="玩家ID")
+    async def unbind_user(interaction: discord.Interaction, username: str):
+        await unbind_user_response(interaction, username)
+
+    @bot.tree.command(
+        name="解除綁定",
+        description="解除玩家 ID 綁定"
+    )
+    @app_commands.describe(username="玩家ID")
+    async def unbind_user_zh(interaction: discord.Interaction, username: str):
+        await unbind_user_response(interaction, username)
+
+    @bot.tree.command(
+        name="show-bindings",
+        description="Show all current Player ID bindings (顯示所有綁定列表)"
+    )
+    async def show_bindings(interaction: discord.Interaction):
+        await show_bindings_response(interaction)
+
+    @bot.tree.command(
+        name="查看綁定",
+        description="查看目前所有玩家 ID 綁定"
+    )
+    async def show_bindings_zh(interaction: discord.Interaction):
+        await show_bindings_response(interaction)
 
     @bot.tree.command(
         name="whois",

@@ -1,7 +1,7 @@
 # main.py
 import discord
 from discord.ext import commands
-from config import TOKEN, CHANNEL_NAME
+from config import TOKEN, CHANNEL_ID
 from database import save_to_db, get_gmt8_time, get_binding
 from parser import extract_info, get_class_display
 
@@ -24,7 +24,7 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-    if message.author.bot or message.channel.name != CHANNEL_NAME:
+    if message.author.bot or message.channel.id != CHANNEL_ID:
         return
 
     processed = False
@@ -60,8 +60,10 @@ async def on_message(message):
             pass
 
 # Import commands to register them
-from commands import delete, getcode, bind
+from commands import bind, delete, getcode, help, statistics
 
+help.setup(bot)
+statistics.setup(bot)
 delete.setup(bot)
 getcode.setup(bot)
 bind.setup(bot)

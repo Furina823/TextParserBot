@@ -18,6 +18,20 @@ def admin_only():
 
 
 def setup(bot: commands.Bot):
+    async def delete_user_response(interaction: discord.Interaction, username: str):
+        count = db_delete_user(interaction.guild_id, username)
+
+        if count == 0:
+            return await interaction.response.send_message(
+                f"❌ No characters found for: {username} (沒有找到任何角色)",
+                ephemeral=True
+            )
+
+        await interaction.response.send_message(
+            f"✅ Deleted **{count}** character(s) for: **{username}** (已刪除以上角色)",
+            ephemeral=True
+        )
+
     # ===== COMMAND: DELETE CHARACTER =====
     @bot.tree.command(
         name="delete-character",
@@ -47,18 +61,16 @@ def setup(bot: commands.Bot):
     @app_commands.describe(username="玩家ID")
     @admin_only()
     async def delete_user(interaction: discord.Interaction, username: str):
-        count = db_delete_user(interaction.guild_id, username)
-        
-        if count == 0:
-            return await interaction.response.send_message(
-                f"❌ No characters found for: {username} (沒有找到任何角色)", 
-                ephemeral=True
-            )
-        
-        await interaction.response.send_message(
-            f"✅ Deleted **{count}** character(s) for: **{username}** (已刪除以上角色)", 
-            ephemeral=True
-        )
+        await delete_user_response(interaction, username)
+
+    @bot.tree.command(
+        name="刪除記錄",
+        description="刪除玩家所有角色記錄（管理員限定）"
+    )
+    @app_commands.describe(username="玩家ID")
+    @admin_only()
+    async def delete_user_zh(interaction: discord.Interaction, username: str):
+        await delete_user_response(interaction, username)
 
     # ===== AUTOCOMPLETES =====
     @delete_character.autocomplete('username')

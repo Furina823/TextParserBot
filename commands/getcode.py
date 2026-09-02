@@ -6,10 +6,7 @@ from database import load_db
 from parser import get_class_display, CLASS_TRANSLATIONS
 
 def setup(bot: commands.Bot):
-    # ===== COMMAND: GET BY USERNAME =====
-    @bot.tree.command(name="getcode-username", description="Search characters by Player ID(搜尋玩家存檔 ID)")
-    @app_commands.describe(username="輸入玩家ID")
-    async def getcode_username(interaction: discord.Interaction, username: str):
+    async def getcode_username_response(interaction: discord.Interaction, username: str):
         db = load_db(interaction.guild_id)
         results = [e for e in db if e["username"].lower() == username.lower()]
 
@@ -66,10 +63,7 @@ def setup(bot: commands.Bot):
 
         await render(interaction)
 
-    # ===== COMMAND: GET BY CLASS =====
-    @bot.tree.command(name="getcode-class", description="Search players by Class(搜尋該職業玩家)")
-    @app_commands.describe(class_name="輸入職業名稱")
-    async def getcode_class(interaction: discord.Interaction, class_name: str):
+    async def getcode_class_response(interaction: discord.Interaction, class_name: str):
         db = load_db(interaction.guild_id)
         results = [e for e in db if e["class"] == class_name]
 
@@ -121,8 +115,29 @@ def setup(bot: commands.Bot):
 
         await render(interaction)
 
+    # ===== COMMAND: GET BY USERNAME =====
+    @bot.tree.command(name="getcode-username", description="Search characters by Player ID(搜尋玩家存檔 ID)")
+    @app_commands.describe(username="輸入玩家ID")
+    async def getcode_username(interaction: discord.Interaction, username: str):
+        await getcode_username_response(interaction, username)
+
+    @bot.tree.command(name="id檔", description="依玩家 ID 搜尋角色存檔")
+    @app_commands.describe(username="輸入玩家ID")
+    async def getcode_username_zh(interaction: discord.Interaction, username: str):
+        await getcode_username_response(interaction, username)
+
+    # ===== COMMAND: GET BY CLASS =====
+    @bot.tree.command(name="getcode-class", description="Search players by Class(搜尋該職業玩家)")
+    @app_commands.describe(class_name="輸入職業名稱")
+    async def getcode_class(interaction: discord.Interaction, class_name: str):
+        await getcode_class_response(interaction, class_name)
+
+    @bot.tree.command(name="角色檔", description="依職業搜尋玩家角色")
+    @app_commands.describe(class_name="輸入職業名稱")
+    async def getcode_class_zh(interaction: discord.Interaction, class_name: str):
+        await getcode_class_response(interaction, class_name)
+
     # ===== AUTOCOMPLETES =====
-    @getcode_class.autocomplete('class_name')
     async def class_autocomplete(interaction: discord.Interaction, current: str):
         db = load_db(interaction.guild_id)
 
@@ -139,7 +154,6 @@ def setup(bot: commands.Bot):
 
         return choices[:25]
 
-    @getcode_username.autocomplete('username')
     async def username_autocomplete(interaction: discord.Interaction, current: str):
         db = load_db(interaction.guild_id)
         seen = {}
@@ -153,3 +167,8 @@ def setup(bot: commands.Bot):
             app_commands.Choice(name=name, value=name)
             for name in usernames if current.lower() in name.lower()
         ][:25]
+
+    getcode_class.autocomplete('class_name')(class_autocomplete)
+    getcode_class_zh.autocomplete('class_name')(class_autocomplete)
+    getcode_username.autocomplete('username')(username_autocomplete)
+    getcode_username_zh.autocomplete('username')(username_autocomplete)

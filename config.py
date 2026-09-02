@@ -28,7 +28,8 @@ def _parse_admin_ids(raw: str | None) -> Set[int]:
 ADMIN_IDS: Set[int] = _parse_admin_ids(os.getenv("ADMIN_IDS"))
 
 # Constants (can be overridden via env if needed)
-CHANNEL_NAME = os.getenv("CHANNEL_NAME", "txt-upload-channel")
+CHANNEL_ID = int(os.getenv("CHANNEL_ID", "1443439576277454938"))
+STATISTICS_ROLE_ID = int(os.getenv("STATISTICS_ROLE_ID", "1440945198837268540"))
 CLASS_TRANS_FILE = os.getenv("CLASS_TRANS_FILE", "class_translations.json")
 DATA_DIR = os.getenv("DATA_DIR", "data")
 
