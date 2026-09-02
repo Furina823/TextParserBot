@@ -2,6 +2,7 @@
 import discord
 from discord import app_commands
 from discord.ext import commands
+from commands.checks import command_access_only, has_command_access
 from database import load_db, delete_character as db_delete_character, delete_user as db_delete_user
 from parser import get_class_display, CLASS_TRANSLATIONS
 from config import ADMIN_IDS
@@ -39,6 +40,7 @@ def setup(bot: commands.Bot):
     )
     @app_commands.describe(username="玩家ID", class_name="職業名稱")
     @admin_only()
+    @command_access_only()
     async def delete_character(interaction: discord.Interaction, username: str, class_name: str):
         success = db_delete_character(interaction.guild_id, username, class_name)
         
@@ -60,6 +62,7 @@ def setup(bot: commands.Bot):
     )
     @app_commands.describe(username="玩家ID")
     @admin_only()
+    @command_access_only()
     async def delete_user(interaction: discord.Interaction, username: str):
         await delete_user_response(interaction, username)
 
@@ -69,12 +72,16 @@ def setup(bot: commands.Bot):
     )
     @app_commands.describe(username="玩家ID")
     @admin_only()
+    @command_access_only()
     async def delete_user_zh(interaction: discord.Interaction, username: str):
         await delete_user_response(interaction, username)
 
     # ===== AUTOCOMPLETES =====
     @delete_character.autocomplete('username')
     async def delete_char_username_autocomplete(interaction: discord.Interaction, current: str):
+        if not has_command_access(interaction):
+            return []
+
         db = load_db(interaction.guild_id)
         seen = {}
         for entry in db:
@@ -90,6 +97,9 @@ def setup(bot: commands.Bot):
 
     @delete_character.autocomplete('class_name')
     async def delete_char_class_autocomplete(interaction: discord.Interaction, current: str):
+        if not has_command_access(interaction):
+            return []
+
         db = load_db(interaction.guild_id)
 
         username = getattr(interaction.namespace, "username", None)

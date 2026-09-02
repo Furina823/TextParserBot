@@ -60,8 +60,9 @@ async def on_message(message):
             pass
 
 # Import commands to register them
-from commands import bind, delete, getcode, help, statistics
+from commands import bind, checks, delete, getcode, help, statistics
 
+checks.setup(bot)
 help.setup(bot)
 statistics.setup(bot)
 delete.setup(bot)

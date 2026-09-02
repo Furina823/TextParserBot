@@ -29,7 +29,8 @@ ADMIN_IDS: Set[int] = _parse_admin_ids(os.getenv("ADMIN_IDS"))
 
 # Constants (can be overridden via env if needed)
 CHANNEL_ID = int(os.getenv("CHANNEL_ID", "1443439576277454938"))
-STATISTICS_ROLE_ID = int(os.getenv("STATISTICS_ROLE_ID", "1440945198837268540"))
+COMMAND_ROLE_ID = int(os.getenv("COMMAND_ROLE_ID", "1440945198837268540"))
+STATISTICS_ROLE_ID = int(os.getenv("STATISTICS_ROLE_ID", str(COMMAND_ROLE_ID)))
 CLASS_TRANS_FILE = os.getenv("CLASS_TRANS_FILE", "class_translations.json")
 DATA_DIR = os.getenv("DATA_DIR", "data")
 

@@ -2,6 +2,7 @@
 import discord
 from discord import app_commands
 from discord.ext import commands
+from commands.checks import command_access_only, has_command_access
 from database import load_db
 from parser import get_class_display, CLASS_TRANSLATIONS
 
@@ -118,27 +119,34 @@ def setup(bot: commands.Bot):
     # ===== COMMAND: GET BY USERNAME =====
     @bot.tree.command(name="getcode-username", description="Search characters by Player ID(搜尋玩家存檔 ID)")
     @app_commands.describe(username="輸入玩家ID")
+    @command_access_only()
     async def getcode_username(interaction: discord.Interaction, username: str):
         await getcode_username_response(interaction, username)
 
     @bot.tree.command(name="id檔", description="依玩家 ID 搜尋角色存檔")
     @app_commands.describe(username="輸入玩家ID")
+    @command_access_only()
     async def getcode_username_zh(interaction: discord.Interaction, username: str):
         await getcode_username_response(interaction, username)
 
     # ===== COMMAND: GET BY CLASS =====
     @bot.tree.command(name="getcode-class", description="Search players by Class(搜尋該職業玩家)")
     @app_commands.describe(class_name="輸入職業名稱")
+    @command_access_only()
     async def getcode_class(interaction: discord.Interaction, class_name: str):
         await getcode_class_response(interaction, class_name)
 
     @bot.tree.command(name="角色檔", description="依職業搜尋玩家角色")
     @app_commands.describe(class_name="輸入職業名稱")
+    @command_access_only()
     async def getcode_class_zh(interaction: discord.Interaction, class_name: str):
         await getcode_class_response(interaction, class_name)
 
     # ===== AUTOCOMPLETES =====
     async def class_autocomplete(interaction: discord.Interaction, current: str):
+        if not has_command_access(interaction):
+            return []
+
         db = load_db(interaction.guild_id)
 
         # Only suggest classes that actually have records in this guild
@@ -155,6 +163,9 @@ def setup(bot: commands.Bot):
         return choices[:25]
 
     async def username_autocomplete(interaction: discord.Interaction, current: str):
+        if not has_command_access(interaction):
+            return []
+
         db = load_db(interaction.guild_id)
         seen = {}
         for entry in db:

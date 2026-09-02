@@ -2,6 +2,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from commands.checks import command_access_only
 from database import set_binding, remove_binding, get_binding, load_bindings
 
 
@@ -43,6 +44,7 @@ def setup(bot: commands.Bot):
         description="Bind a Player ID to a Discord user (綁定玩家ID)"
     )
     @app_commands.describe(username="玩家ID", user="要綁定的 Discord 使用者")
+    @command_access_only()
     async def bind_user(interaction: discord.Interaction, username: str, user: discord.Member):
         await bind_user_response(interaction, username, user)
 
@@ -51,6 +53,7 @@ def setup(bot: commands.Bot):
         description="綁定玩家 ID 到 Discord 使用者"
     )
     @app_commands.describe(username="玩家ID", user="要綁定的 Discord 使用者")
+    @command_access_only()
     async def bind_user_zh(interaction: discord.Interaction, username: str, user: discord.Member):
         await bind_user_response(interaction, username, user)
 
@@ -59,6 +62,7 @@ def setup(bot: commands.Bot):
         description="Remove binding for a Player ID (解除玩家ID綁定)"
     )
     @app_commands.describe(username="玩家ID")
+    @command_access_only()
     async def unbind_user(interaction: discord.Interaction, username: str):
         await unbind_user_response(interaction, username)
 
@@ -67,6 +71,7 @@ def setup(bot: commands.Bot):
         description="解除玩家 ID 綁定"
     )
     @app_commands.describe(username="玩家ID")
+    @command_access_only()
     async def unbind_user_zh(interaction: discord.Interaction, username: str):
         await unbind_user_response(interaction, username)
 
@@ -74,6 +79,7 @@ def setup(bot: commands.Bot):
         name="show-bindings",
         description="Show all current Player ID bindings (顯示所有綁定列表)"
     )
+    @command_access_only()
     async def show_bindings(interaction: discord.Interaction):
         await show_bindings_response(interaction)
 
@@ -81,6 +87,7 @@ def setup(bot: commands.Bot):
         name="查看綁定",
         description="查看目前所有玩家 ID 綁定"
     )
+    @command_access_only()
     async def show_bindings_zh(interaction: discord.Interaction):
         await show_bindings_response(interaction)
 
@@ -89,6 +96,7 @@ def setup(bot: commands.Bot):
         description="Show who a Player ID is bound to(查詢玩家ID綁定)"
     )
     @app_commands.describe(username="玩家ID")
+    @command_access_only()
     async def whois(interaction: discord.Interaction, username: str):
         bound_id = get_binding(interaction.guild_id, username)
         if not bound_id:

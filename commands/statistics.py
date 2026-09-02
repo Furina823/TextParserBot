@@ -3,6 +3,7 @@ from datetime import datetime
 import discord
 from discord.ext import commands
 
+from commands.checks import command_access_only
 from config import STATISTICS_ROLE_ID
 from database import load_bindings, load_db, normalize_username
 from parser import CLASS_TRANSLATIONS
@@ -150,6 +151,7 @@ def setup(bot: commands.Bot):
         name="statistic-record",
         description="Show latest character update dates for bound members with the tracked role"
     )
+    @command_access_only()
     async def statistic_record(interaction: discord.Interaction):
         await statistics_response(interaction, chinese=False)
 
@@ -157,5 +159,6 @@ def setup(bot: commands.Bot):
         name="統計記錄",
         description="查看已綁定且擁有指定身分組玩家的角色更新日期"
     )
+    @command_access_only()
     async def statistic_record_zh(interaction: discord.Interaction):
         await statistics_response(interaction, chinese=True)

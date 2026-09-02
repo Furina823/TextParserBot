@@ -1,7 +1,8 @@
 import discord
 from discord.ext import commands
 
-from config import CHANNEL_ID
+from commands.checks import command_access_only
+from config import CHANNEL_ID, COMMAND_ROLE_ID
 
 
 def setup(bot: commands.Bot):
@@ -10,7 +11,7 @@ def setup(bot: commands.Bot):
             title="Bot Commands",
             description=(
                 f"Upload `.txt` save files in <#{CHANNEL_ID}>.\n"
-                "Use these commands to search records, manage bindings, and review updates."
+                f"Commands only work in this channel for members with <@&{COMMAND_ROLE_ID}>."
             ),
             color=discord.Color.blurple()
         )
@@ -77,7 +78,7 @@ def setup(bot: commands.Bot):
             title="指令列表",
             description=(
                 f"請在 <#{CHANNEL_ID}> 上傳 `.txt` 存檔。\n"
-                "使用以下指令查詢記錄、管理綁定與查看更新。"
+                f"指令只能在此頻道使用，並且需要擁有 <@&{COMMAND_ROLE_ID}> 身分組。"
             ),
             color=discord.Color.blurple()
         )
@@ -139,6 +140,7 @@ def setup(bot: commands.Bot):
         name="commands",
         description="Show all bot commands and how to use them"
     )
+    @command_access_only()
     async def commands_list(interaction: discord.Interaction):
         await english_commands_response(interaction)
 
@@ -146,5 +148,6 @@ def setup(bot: commands.Bot):
         name="指令",
         description="顯示所有指令與使用方式"
     )
+    @command_access_only()
     async def commands_list_zh(interaction: discord.Interaction):
         await chinese_commands_response(interaction)
