@@ -15,6 +15,19 @@ def load_class_translations():
 CLASS_TRANSLATIONS = load_class_translations()
 CLASS_LIST = list(CLASS_TRANSLATIONS.keys())
 
+# Alternate in-game class names mapped to their canonical class (color codes stripped)
+CLASS_ALIASES = {
+    "『真我之律者』": "Lightseeker",
+}
+
+def strip_color_codes(text):
+    """Remove WC3 color codes (|cAARRGGBB and |r) from text"""
+    return re.sub(r'\|c[0-9A-Fa-f]{8}|\|r', '', text)
+
+def normalize_class(class_name):
+    """Map alternate class names to their canonical class"""
+    return CLASS_ALIASES.get(strip_color_codes(class_name).strip(), class_name)
+
 def get_class_display(class_name):
     """Get class name with Chinese translation"""
     chinese = CLASS_TRANSLATIONS.get(class_name, "")
@@ -32,7 +45,7 @@ def extract_info(text):
         return "N/A"
 
     username = clean_match(r'User Name:\s*([^"]+)', text)
-    player_class = clean_match(r'Class:\s*([^"]+)', text)
+    player_class = normalize_class(clean_match(r'Class:\s*([^"]+)', text))
     played_version = clean_match(r'Played Version:\s*([^"]+)', text)
     compatible_version = clean_match(r'Compatible Version:\s*([^"]+)', text)
     
